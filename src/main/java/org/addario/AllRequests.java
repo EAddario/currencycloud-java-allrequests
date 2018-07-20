@@ -22,7 +22,7 @@ public class AllRequests
          * Authenticate
          */
         System.out.println(BLUE + "Login Id: " + args[0] + " API Key: " + args[1] + RESET);
-        CurrencyCloudClient client = new CurrencyCloudClient(CurrencyCloudClient.Environment.demo, args[2], args[3]);
+        CurrencyCloudClient client = new CurrencyCloudClient(CurrencyCloudClient.Environment.demo, args[0], args[1]);
 
         /*
          * Accounts API
@@ -64,7 +64,7 @@ public class AllRequests
         System.out.println(GREEN + "FindBalances: " + findBalances.toString() + RESET);
 
         if (findBalances.getBalances() != null) {
-            balance.setId(findBalances.getBalances().iterator().next().getId());
+            balance.setCurrency(findBalances.getBalances().iterator().next().getCurrency());
             Balance retrieveBalance = RetrieveBalance(client, balance);
             System.out.println(GREEN + "RetrieveBalance: " + retrieveBalance.toString() + RESET);
         }
@@ -96,8 +96,8 @@ public class AllRequests
 
         beneficiary = Beneficiary.create();
         beneficiary.setId(retrieveBeneficiary.getId());
-        beneficiary.setBeneficiaryFirstName("Tamara");
-        beneficiary.setBeneficiaryLastName("Carlton");
+        //beneficiary.setBeneficiaryFirstName("Tamara");
+        //beneficiary.setBeneficiaryLastName("Carlton");
         beneficiary.setEmail("development@currencycloud.com");
         List<String> address = new ArrayList<>();
         address.add("Piazza Museo, n° 19");
@@ -196,6 +196,7 @@ public class AllRequests
         payment.setReference("REF-INV-" + (new Random().nextInt(1000) + 1000));
         payment.setPaymentType("regular");
         payment.setConversionId(createConversion.getId());
+        payment.setUniqueRequestId(UUID.randomUUID().toString());
         Payment createPayment = CreatePayment(client, payment);
         System.out.println(BLUE + "CreatePayment: " + createPayment.toString() + RESET);
 
@@ -748,6 +749,38 @@ public class AllRequests
             return Conversion.create();
         }
     }
+
+    /*
+     * Quote Conversion Date Change
+     */
+
+    /*
+     * Conversion Date Change
+     */
+
+    /*
+     * Conversion Retrieve Profit / Loss
+     */
+
+    /*
+     * Conversion Split Preview
+     */
+
+    /*
+     * Conversion Split
+     */
+
+    /*
+     * Conversion Split History
+     */
+
+    /*
+     * Quote Conversion Cancellation
+     */
+
+    /*
+     * Conversion Cancellation
+     */
 
     /*
      * Find IBANs
