@@ -25,16 +25,17 @@ package org.addario;
 
 import com.currencycloud.client.CurrencyCloudClient;
 import com.currencycloud.client.model.*;
+import com.currencycloud.client.model.ConversionDates;
 import com.currencycloud.client.model.Currency;
+import com.currencycloud.client.model.PaymentDates;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
-import static org.addario.CurrencyCloudEndpoints.*;
 import static org.addario.AnsiColors.*;
+import static org.addario.CurrencyCloudEndpoints.*;
 import static org.addario.Utils.*;
 
 public class AllRequests {
@@ -202,7 +203,7 @@ public class AllRequests {
         conversion.setBuyCurrency("EUR");
         conversion.setSellCurrency("GBP");
         conversion.setFixedSide("buy");
-        conversion.setAmount(new BigDecimal(new Random().nextFloat() * 5000).setScale(2, RoundingMode.HALF_UP));
+        conversion.setAmount(new BigDecimal(new Random().nextFloat() * 5000 + 1000).setScale(2, RoundingMode.HALF_UP));
         conversion.setReason("Invoice Payment");
         conversion.setTermAgreement(true);
         conversion.setUniqueRequestId(UUID.randomUUID().toString());
@@ -214,27 +215,33 @@ public class AllRequests {
         Conversion retrievedConversion = RetrieveConversion(client, conversion);
         PrintLn("RetrieveConversion: " + retrievedConversion);
 
-        ConversionDateChange quoteDateChangeConversion = QuoteDateChangeConversion(client, ConversionDateChange.create(
-                retrievedConversion.getId(),
-                Date.from(LocalDate.now().plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+        ConversionDateChange dateChange = ConversionDateChange.create(
+                createdConversion.getId(),
+                new Date(System.currentTimeMillis() + (86400 * 7 * 1000)) //7 days from now
         );
-        PrintLn("QuoteDateChangeConversion: " + quoteDateChangeConversion);
+        ConversionDateChange quotedDateChangeConversion = QuoteDateChangeConversion(client, dateChange);
+        PrintLn("QuoteDateChangeConversion: " + quotedDateChangeConversion);
 
-        ConversionDateChange dateChangedConversion = DateChangeConversion(client, ConversionDateChange.create(
-                retrievedConversion.getId(),
-                Date.from(LocalDate.now().plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()))
-        );
+        ConversionDateChange dateChangedConversion = DateChangeConversion(client, dateChange);
         PrintLn("DateChangeConversion: " + dateChangedConversion);
 
-        //TODO: Conversion Split Preview
+        ConversionSplit splitPreview = ConversionSplit.create(
+                createdConversion.getId(),
+                createdConversion.getClientBuyAmount().multiply(new BigDecimal("0.5"), new MathContext(2))
+        );
+        ConversionSplit splitPreviewConversion = SplitPreviewConversion(client,splitPreview);
+        PrintLn("SplitPreviewConversion: " + splitPreviewConversion);
 
-        //TODO: Conversion Split
+        ConversionSplit splittedConversion = SplitConversion(client,splitPreview);
+        PrintLn("SplitConversion: " + splittedConversion);
 
-        //TODO: Conversion Split History
+        ConversionSplitHistory splitHistory = ConversionSplitHistory.create(createdConversion.getId());
+        ConversionSplitHistory splittedHistoryConversion = SplitHistoryConversion(client, splitHistory);
+        PrintLn("splittedHistoryConversion" + splittedHistoryConversion);
 
-        //TODO: Conversion Retrieve Profit / Loss
-
-        //TODO: Quote Conversion Cancellation
+        ConversionProfitAndLoss profitAndLoss = ConversionProfitAndLoss.create();
+        ConversionProfitAndLosses profitAndLossesConversion = ProfitAndLossesConversion(client, profitAndLoss);
+        PrintLn("ProfitAndLossesConversion" + profitAndLossesConversion);
 
         /*
          * IBANs API
@@ -261,7 +268,7 @@ public class AllRequests {
 
         payment.setCurrency("EUR");
         payment.setBeneficiaryId(beneficiary.getId());
-        payment.setAmount(createdConversion.getClientBuyAmount());
+        payment.setAmount(splittedConversion.getParentConversion().getBuyAmount());
         payment.setReason("Invoice");
         payment.setReference("REF-INV-" + (new Random().nextInt(1000) + 1000));
         payment.setPaymentType("regular");
@@ -304,9 +311,13 @@ public class AllRequests {
 
         List<String> pairs = new ArrayList<>();
         pairs.add("GBPEUR");
+        pairs.add("EURGBP");
         pairs.add("GBPUSD");
+        pairs.add("USDGBP");
         pairs.add("GBPCAD");
+        pairs.add("CADGBP");
         pairs.add("GBPAUD");
+        pairs.add("AUDGBP");
         pairs.add("FOOBAR");
         Rates rates = FindRates(client, pairs);
         PrintLn("FindRates: " + rates);
@@ -406,7 +417,14 @@ public class AllRequests {
             Payment deletedPayment = DeletePayment(client, createdPayment);
             PrintLn("DeletePayment: " + deletedPayment);
 
-            //TODO: Conversion Cancellation
+            ConversionCancellation cancellation = ConversionCancellation.create();
+            cancellation.setId(splittedConversion.getChildConversion().getId());
+            ConversionCancellation cancelledConversion = CancellationConversion(client, cancellation);
+            PrintLn("ChildCancellationConversion: " + cancelledConversion);
+
+            cancellation.setId(splittedConversion.getParentConversion().getId());
+            cancelledConversion = CancellationConversion(client, cancellation);
+            PrintLn("ParentCancellationConversion: " + cancelledConversion);
 
             Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
             PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
