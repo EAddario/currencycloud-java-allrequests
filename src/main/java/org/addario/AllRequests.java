@@ -25,9 +25,7 @@ package org.addario;
 
 import com.currencycloud.client.CurrencyCloudClient;
 import com.currencycloud.client.model.*;
-import com.currencycloud.client.model.ConversionDates;
 import com.currencycloud.client.model.Currency;
-import com.currencycloud.client.model.PaymentDates;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -364,16 +362,16 @@ public class AllRequests {
         Settlement retrievedSettlement = RetrieveSettlement(client, settlement);
         PrintLn("RetrieveSettlement: " + retrievedSettlement);
 
-        Settlement addedConversionSettlement = AddConversionSettlement(client, settlement, conversion);
+        Settlement addedConversionSettlement = AddConversionSettlement(client, createdSettlement, createdConversion);
         PrintLn("AddConversionSettlement: " + addedConversionSettlement);
 
-        Settlement releasedSettlement = ReleaseSettlement(client, settlement);
+        Settlement releasedSettlement = ReleaseSettlement(client, addedConversionSettlement);
         PrintLn("ReleaseSettlement: " + releasedSettlement);
 
-        Settlement unreleasedSettlement = UnreleaseSettlement(client, settlement);
+        Settlement unreleasedSettlement = UnreleaseSettlement(client, releasedSettlement);
         PrintLn("UnreleaseSettlement: " + unreleasedSettlement);
 
-        Settlement removedConversionSettlement = RemoveConversionSettlement(client, settlement, conversion);
+        Settlement removedConversionSettlement = RemoveConversionSettlement(client, createdSettlement, createdConversion);
         PrintLn("RemoveConversionSettlement: " + removedConversionSettlement);
 
         /*
@@ -396,12 +394,20 @@ public class AllRequests {
         Transfers foundTransfers = FindTransfers(client, transfer);
         PrintLn("FindTransfers: " + "{\"transfers\":" + foundTransfers.toString() + "}");
 
-        transfer.setSourceAccountId(currentAccount.getId());
-        transfer.setDestinationAccountId(currentAccount.getId());
+        Iterator<Account> iter = foundAccounts.getAccounts().iterator();
+        Account sourceAccount = iter.next();
+        Account destinationAccount = iter.next();
+        transfer.setSourceAccountId(sourceAccount.getId());
+        transfer.setDestinationAccountId(destinationAccount.getId());
         transfer.setCurrency("GBP");
-        transfer.setAmount(new BigDecimal(1234));
+        transfer.setAmount(new BigDecimal(new Random().nextFloat() * 1000 + 1000).setScale(2, RoundingMode.HALF_UP));
         Transfer createdTransfer = CreateTransfer(client, transfer);
         PrintLn("CreateTransfer: " + createdTransfer);
+
+        transfer.setSourceAccountId(destinationAccount.getId());
+        transfer.setDestinationAccountId(sourceAccount.getId());
+        Transfer reversedTransfer = CreateTransfer(client, transfer);
+        PrintLn("ReverseTransfer: " + reversedTransfer);
 
         transfer.setId(createdTransfer.getId());
         Transfer retrievedTransfer = RetrieveTransfer(client, transfer);
