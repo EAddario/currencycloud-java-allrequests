@@ -345,24 +345,48 @@ public class SomeRequests {
         }
 
         /*
-         * Delete objects if unmutable is true
+         * Transfers API
          */
-        if (true) {
-            Payment deletedPayment = DeletePayment(client, createdPayment);
-            PrintLn("DeletePayment: " + deletedPayment);
+        Transfer transfer = Transfer.create();
+        Transfers foundTransfers = FindTransfers(client, transfer);
+        PrintLn("FindTransfers: " + "{\"transfers\":" + foundTransfers.toString() + "}");
 
-            ConversionCancellation cancellation = ConversionCancellation.create();
-            cancellation.setId(splittedConversion.getChildConversion().getId());
-            ConversionCancellation cancelledConversion = CancellationConversion(client, cancellation);
-            PrintLn("ChildCancellationConversion: " + cancelledConversion);
+        Iterator<Account> iter = foundAccounts.getAccounts().iterator();
+        Account sourceAccount = iter.next();
+        Account destinationAccount = iter.next();
+        transfer.setSourceAccountId(sourceAccount.getId());
+        transfer.setDestinationAccountId(destinationAccount.getId());
+        transfer.setCurrency("GBP");
+        transfer.setAmount(new BigDecimal(new Random().nextFloat() * 1000 + 1000).setScale(2, RoundingMode.HALF_UP));
+        Transfer createdTransfer = CreateTransfer(client, transfer);
+        PrintLn("CreateTransfer: " + createdTransfer);
 
-            cancellation.setId(splittedConversion.getParentConversion().getId());
-            cancelledConversion = CancellationConversion(client, cancellation);
-            PrintLn("ParentCancellationConversion: " + cancelledConversion);
+        transfer.setSourceAccountId(destinationAccount.getId());
+        transfer.setDestinationAccountId(sourceAccount.getId());
+        Transfer reversedTransfer = CreateTransfer(client, transfer);
+        PrintLn("ReverseTransfer: " + reversedTransfer);
 
-            Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
-            PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
-        }
+        transfer.setId(createdTransfer.getId());
+        Transfer retrievedTransfer = RetrieveTransfer(client, transfer);
+        PrintLn("FindTransfer: " + retrievedTransfer);
+
+        /*
+         * Delete/Cancel objects
+         */
+        Payment deletedPayment = DeletePayment(client, createdPayment);
+        PrintLn("DeletePayment: " + deletedPayment);
+
+        ConversionCancellation cancellation = ConversionCancellation.create();
+        cancellation.setId(splittedConversion.getChildConversion().getId());
+        ConversionCancellation cancelledConversion = CancellationConversion(client, cancellation);
+        PrintLn("ChildCancellationConversion: " + cancelledConversion);
+
+        cancellation.setId(splittedConversion.getParentConversion().getId());
+        cancelledConversion = CancellationConversion(client, cancellation);
+        PrintLn("ParentCancellationConversion: " + cancelledConversion);
+
+        Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
+        PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
 
         EndSession(client);
         PrintLn("Logged Out");
