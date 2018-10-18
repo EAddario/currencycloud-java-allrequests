@@ -41,7 +41,6 @@ public class AllRequests {
     static ArrayList<String> colors = new ArrayList<>();
 
     public static void main(String[] args) {
-        boolean unmutable = true;
         colors.add(BLACK_BOLD);
         colors.add(BLUE_BOLD);
         colors.add(CYAN_BOLD);
@@ -52,7 +51,7 @@ public class AllRequests {
         colors.add(YELLOW_BOLD);
 
         //TODO: Comment out to run chosen subset of calls only. Program exits after SomeRequests execution
-        SomeRequests.Run(args[0], args[1]);
+        //SomeRequests.Run(args[0], args[1]);
 
         /*
          * Authenticate
@@ -414,28 +413,29 @@ public class AllRequests {
         PrintLn("FindTransfer: " + retrievedTransfer);
 
         /*
-         * Delete objects if unmutable is true
+         * Delete objects
          */
-        if (unmutable) {
-            Settlement deletedSettlement = DeleteSettlement(client, createdSettlement);
-            PrintLn("DeleteSettlement: " + deletedSettlement);
+        Settlement deletedSettlement = DeleteSettlement(client, createdSettlement);
+        PrintLn("DeleteSettlement: " + deletedSettlement);
 
-            Payment deletedPayment = DeletePayment(client, createdPayment);
-            PrintLn("DeletePayment: " + deletedPayment);
+        Payment deletedPayment = DeletePayment(client, createdPayment);
+        PrintLn("DeletePayment: " + deletedPayment);
 
-            ConversionCancellation cancellation = ConversionCancellation.create();
-            cancellation.setId(splittedConversion.getChildConversion().getId());
-            ConversionCancellation cancelledConversion = CancellationConversion(client, cancellation);
-            PrintLn("ChildCancellationConversion: " + cancelledConversion);
+        ConversionCancellation cancellation = ConversionCancellation.create();
+        cancellation.setId(splittedConversion.getChildConversion().getId());
+        ConversionCancellation cancelledConversion = CancellationConversion(client, cancellation);
+        PrintLn("ChildCancellationConversion: " + cancelledConversion);
 
-            cancellation.setId(splittedConversion.getParentConversion().getId());
-            cancelledConversion = CancellationConversion(client, cancellation);
-            PrintLn("ParentCancellationConversion: " + cancelledConversion);
+        cancellation.setId(splittedConversion.getParentConversion().getId());
+        cancelledConversion = CancellationConversion(client, cancellation);
+        PrintLn("ParentCancellationConversion: " + cancelledConversion);
 
-            Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
-            PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
-        }
+        Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
+        PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
 
+        /*
+         * Logoff
+         */
         EndSession(client);
     }
 }
