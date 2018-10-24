@@ -24,9 +24,6 @@
 package org.addario;
 
 import com.currencycloud.client.CurrencyCloudClient;
-import com.currencycloud.client.model.Account;
-import com.currencycloud.client.model.Accounts;
-import com.currencycloud.client.model.Transfer;
 
 import static org.addario.CurrencyCloudEndpoints.*;
 import static org.addario.Utils.PrintLn;
@@ -39,7 +36,7 @@ public class SomeRequests {
         PrintLn("Logged In");
 
         //TODO: Add API calls here
-        
+
         EndSession(client);
         PrintLn("Logged Out");
 
