@@ -25,7 +25,8 @@ package org.addario;
 
 import com.currencycloud.client.CurrencyCloudClient;
 
-import static org.addario.CurrencyCloudEndpoints.*;
+import static org.addario.CurrencyCloudEndpoints.Authenticate;
+import static org.addario.CurrencyCloudEndpoints.EndSession;
 import static org.addario.Utils.PrintLn;
 
 public class SomeRequests {

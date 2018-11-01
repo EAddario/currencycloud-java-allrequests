@@ -1173,6 +1173,78 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Create Conversion Report
+     *
+     */
+    static ConversionReport CreateConversionReport(CurrencyCloudClient client, ConversionReport report) {
+        ConversionReport createConversionReport;
+        try {
+            final BackOffResult<ConversionReport> createConversionReportResult = BackOff.<ConversionReport>builder()
+                    .withTask(() -> client.createConversionReport(report))
+                    .execute();
+            createConversionReport = createConversionReportResult.data.orElse(ConversionReport.create());
+            return createConversionReport;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("CreateConversionReport Exception: " + e.getMessage());
+            return ConversionReport.create();
+        }
+    }
+
+    /*
+     * Create Payment Report
+     *
+     */
+    static PaymentReport CreatePaymentReport(CurrencyCloudClient client, PaymentReport report) {
+        PaymentReport createPaymentReport;
+        try {
+            final BackOffResult<PaymentReport> createPaymentReportResult = BackOff.<PaymentReport>builder()
+                    .withTask(() -> client.createPaymentReport(report))
+                    .execute();
+            createPaymentReport = createPaymentReportResult.data.orElse(PaymentReport.create());
+            return createPaymentReport;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("CreatePaymentReport Exception: " + e.getMessage());
+            return PaymentReport.create();
+        }
+    }
+
+    /*
+     * Find Report Requests
+     *
+     */
+    static ReportRequests FindReportRequests(CurrencyCloudClient client, ReportRequest report) {
+        ReportRequests findReportRequests;
+        try {
+            final BackOffResult<ReportRequests> findReportRequestsResult = BackOff.<ReportRequests>builder()
+                    .withTask(() -> client.findReportRequests(report, null))
+                    .execute();
+            findReportRequests = findReportRequestsResult.data.orElse(new ReportRequests());
+            return findReportRequests;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("FindReportRequests Exception: " + e.getMessage());
+            return new ReportRequests();
+        }
+    }
+
+    /*
+     * Retrieve Report Request
+     *
+     */
+    static ReportRequest RetrieveReportRequest(CurrencyCloudClient client, ReportRequest report) {
+        ReportRequest retrieveReportRequest;
+        try {
+            final BackOffResult<ReportRequest> retrieveReportRequestResult = BackOff.<ReportRequest>builder()
+                    .withTask(() -> client.retrieveReportRequests(report.getId()))
+                    .execute();
+            retrieveReportRequest = retrieveReportRequestResult.data.orElse(ReportRequest.create());
+            return retrieveReportRequest;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("RetrieveReportRequest Exception: " + e.getMessage());
+            return ReportRequest.create();
+        }
+    }
+
+    /*
      * End API session
      * All sessions must come to an end, either manually using this call, or the session will automatically timeout
      * after 30 minutes of inactivity. If the session is no longer required, it is best practice to close the session
