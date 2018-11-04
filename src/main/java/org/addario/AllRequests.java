@@ -50,7 +50,7 @@ public class AllRequests {
         colors.add(WHITE_BOLD);
         colors.add(YELLOW_BOLD);
 
-        //TODO: Comment out to run chosen subset of calls only. Program exits after SomeRequests execution
+        //ToDo: Comment out to run chosen subset of calls only. Program exits after SomeRequests execution
         //SomeRequests.Run(args[0], args[1]);
 
         /*
@@ -285,7 +285,7 @@ public class AllRequests {
         payment.setWithDeleted(false);
         payment.setReference("REF-INV-" + new Random().nextInt(1000));
         Payment updatedPayment = UpdatePayment(client, payment);
-        PrintLn("UpdatePayment: " + updatedPayment.toString());
+        PrintLn("UpdatePayment: " + updatedPayment);
 
         /*
          * Payers API
@@ -348,6 +348,44 @@ public class AllRequests {
         PrintLn("PaymentPurposeCodes: " + "{\"purpose_codes\":" + paymentPurposeCodes + "}");
 
         /*
+         * Report Requests
+         */
+        ConversionReport conversionReport = ConversionReport.create();
+        conversionReport.setDescription("Conversion Report: " + RandomChars(10));
+        conversionReport.setBuyCurrency("CAD");
+        conversionReport.setSellCurrency("GBP");
+        conversionReport.setClientBuyAmountFrom(new BigDecimal("0.00"));
+        conversionReport.setClientBuyAmountTo(new BigDecimal("99999.99"));
+        conversionReport.setConversionDateFrom(new GregorianCalendar(2018, Calendar.JANUARY, 1).getTime());
+        conversionReport.setConversionDateTo(new GregorianCalendar(2018, Calendar.DECEMBER, 31).getTime());
+        conversionReport.setUniqueRequestId(UUID.randomUUID().toString());
+        ConversionReport foundConversionReport = CreateConversionReport(client, conversionReport);
+        PrintLn("CreateConversionReport: " + foundConversionReport);
+
+        PaymentReport paymentReport = PaymentReport.create();
+        paymentReport.setDescription("Payment Report: " + RandomChars(10));
+        paymentReport.setCurrency("EUR");
+        paymentReport.setUniqueRequestId(UUID.randomUUID().toString());
+        paymentReport.setAmountFrom(new BigDecimal("0.00"));
+        paymentReport.setAmountTo(new BigDecimal("99999.99"));
+        paymentReport.setCreatedAtFrom(new GregorianCalendar(2018, Calendar.JANUARY, 1).getTime());
+        paymentReport.setCreatedAtTo(new GregorianCalendar(2018, Calendar.DECEMBER, 31).getTime());
+        PaymentReport foundPaymentReport = CreatePaymentReport(client, paymentReport);
+        PrintLn("Create Payment Report: " + foundPaymentReport);
+
+        ReportRequest retriveReport = ReportRequest.create(foundConversionReport.getId());
+        ReportRequest retrievedConversionReportRequest = RetrieveReportRequest(client, retriveReport);
+        PrintLn("RetrieveConversionReportRequest: " + retrievedConversionReportRequest);
+
+        retriveReport = ReportRequest.create(foundPaymentReport.getId());
+        ReportRequest retrievedPaymentReportRequest = RetrieveReportRequest(client, retriveReport);
+        PrintLn("RetrievePaymentReportRequest: " + retrievedPaymentReportRequest);
+
+        ReportRequest findReports = ReportRequest.create();
+        ReportRequests foundReportRequest = FindReportRequests(client, findReports);
+        PrintLn("FindReportRequests: " + foundReportRequest);
+
+        /*
          * Settlements API
          */
         Settlement settlement = Settlement.create();
@@ -378,7 +416,7 @@ public class AllRequests {
          */
         Transaction transaction = Transaction.create();
         Transactions foundTransactions = FindTrasactions(client, transaction);
-        PrintLn("findTransaction: " + foundTransactions);
+        PrintLn("FindTransaction: " + foundTransactions);
 
         if (foundTransactions.getTransactions() != null) {
             transaction.setId(foundTransactions.getTransactions().iterator().next().getId());
@@ -391,7 +429,7 @@ public class AllRequests {
          */
         Transfer transfer = Transfer.create();
         Transfers foundTransfers = FindTransfers(client, transfer);
-        PrintLn("FindTransfers: " + "{\"transfers\":" + foundTransfers.toString() + "}");
+        PrintLn("FindTransfers: " + "{\"transfers\":" + foundTransfers + "}");
 
         Iterator<Account> iter = foundAccounts.getAccounts().iterator();
         Account sourceAccount = iter.next();
@@ -432,44 +470,6 @@ public class AllRequests {
 
         Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
         PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
-
-        /*
-         * Report Requests
-         */
-        ConversionReport conversionReport = ConversionReport.create();
-        conversionReport.setDescription("Conversion Report: " + RandomChars(10));
-        conversionReport.setBuyCurrency("CAD");
-        conversionReport.setSellCurrency("GBP");
-        conversionReport.setClientBuyAmountFrom(new BigDecimal("0.00"));
-        conversionReport.setClientBuyAmountTo(new BigDecimal("99999.99"));
-        conversionReport.setConversionDateFrom(new GregorianCalendar(2018, Calendar.JANUARY, 1).getTime());
-        conversionReport.setConversionDateTo(new GregorianCalendar(2018, Calendar.DECEMBER, 31).getTime());
-        conversionReport.setUniqueRequestId(UUID.randomUUID().toString());
-        ConversionReport foundConversionReport = CreateConversionReport(client, conversionReport);
-        PrintLn("CreateConversionReport: " + foundConversionReport.toString());
-
-        PaymentReport paymentReport = PaymentReport.create();
-        paymentReport.setDescription("Payment Report: " + RandomChars(10));
-        paymentReport.setCurrency("EUR");
-        paymentReport.setUniqueRequestId(UUID.randomUUID().toString());
-        paymentReport.setAmountFrom(new BigDecimal("0.00"));
-        paymentReport.setAmountTo(new BigDecimal("99999.99"));
-        paymentReport.setCreatedAtFrom(new GregorianCalendar(2018, Calendar.JANUARY, 1).getTime());
-        paymentReport.setCreatedAtTo(new GregorianCalendar(2018, Calendar.DECEMBER, 31).getTime());
-        PaymentReport foundPaymentReport = CreatePaymentReport(client, paymentReport);
-        PrintLn("Create Payment Report: " + foundPaymentReport.toString());
-
-        ReportRequest retriveReport = ReportRequest.create(foundConversionReport.getId());
-        ReportRequest retrievedConversionReportRequest = RetrieveReportRequest(client, retriveReport);
-        PrintLn("RetrieveConversionReportRequest: " + retrievedConversionReportRequest.toString());
-
-        retriveReport = ReportRequest.create(foundPaymentReport.getId());
-        ReportRequest retrievedPaymentReportRequest = RetrieveReportRequest(client, retriveReport);
-        PrintLn("RetrievePaymentReportRequest: " + retrievedPaymentReportRequest.toString());
-
-        ReportRequest findReports = ReportRequest.create();
-        ReportRequests foundReportRequest = FindReportRequests(client, findReports);
-        PrintLn("FindReportRequests: " + foundReportRequest.toString());
 
         /*
          * Logoff
