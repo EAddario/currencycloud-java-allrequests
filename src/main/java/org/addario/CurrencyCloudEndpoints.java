@@ -731,6 +731,24 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Payment Confirmation
+     * Returns an object containing the details of a payment confirmation.
+     */
+    static PaymentConfirmation RetrievePaymentConfirmation(CurrencyCloudClient client, PaymentConfirmation payment) {
+        PaymentConfirmation retrievePaymentConfirmation;
+        try {
+            final BackOffResult<PaymentConfirmation> retrievePaymentConfirmationResult = BackOff.<PaymentConfirmation>builder()
+                    .withTask(() -> client.retrievePaymentConfirmation(payment.getId()))
+                    .execute();
+            retrievePaymentConfirmation = retrievePaymentConfirmationResult.data.orElse(PaymentConfirmation.create());
+            return retrievePaymentConfirmation;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("RetrievePaymentConfirmation Exception: " + e.getMessage());
+            return PaymentConfirmation.create();
+        }
+    }
+
+    /*
      * Retrieve Payer
      * Returns an object containing the details of the requested payer.
      */
@@ -1187,6 +1205,24 @@ class CurrencyCloudEndpoints {
         } catch (RuntimeException e) {
             ErrorPrintLn("RetrieveTrasaction Exception: " + e.getMessage());
             return Transaction.create();
+        }
+    }
+
+    /*
+     * Sender Details
+     * Returns an object containing the details of the sender.
+     */
+    static SenderDetails RetrieveSenderDetails(CurrencyCloudClient client, SenderDetails details) {
+        SenderDetails retrieveSenderDetails;
+        try {
+            final BackOffResult<SenderDetails> retrieveSenderDetailsResult = BackOff.<SenderDetails>builder()
+                    .withTask(() -> client.retrieveSenderDetails(details.getId()))
+                    .execute();
+            retrieveSenderDetails = retrieveSenderDetailsResult.data.orElse(SenderDetails.create());
+            return retrieveSenderDetails;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("RetrieveSenderDetails Exception: " + e.getMessage());
+            return SenderDetails.create();
         }
     }
 

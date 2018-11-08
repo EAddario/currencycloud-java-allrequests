@@ -287,6 +287,10 @@ public class AllRequests {
         Payment updatedPayment = UpdatePayment(client, payment);
         PrintLn("UpdatePayment: " + updatedPayment);
 
+        PaymentConfirmation confirmation = PaymentConfirmation.create(retrievedPayment.getId());
+        PaymentConfirmation retrievedPaymentConfirmation = RetrievePaymentConfirmation(client, confirmation);
+        PrintLn("RetrievePaymentConfirmation: " + retrievedPaymentConfirmation);
+
         /*
          * Payers API
          */
@@ -421,7 +425,11 @@ public class AllRequests {
         if (foundTransactions.getTransactions() != null) {
             transaction.setId(foundTransactions.getTransactions().iterator().next().getId());
             Transaction retrievedTransaction = RetrieveTrasaction(client, transaction);
-            PrintLn("RetrieveTrasaction: " + retrievedTransaction);
+            PrintLn("RetrieveTransaction: " + retrievedTransaction);
+
+            SenderDetails details = SenderDetails.create(retrievedTransaction.getId());
+            SenderDetails retrievedSenderDetails = RetrieveSenderDetails(client, details);
+            PrintLn("RetrieveSenderDetails: " + retrievedSenderDetails);
         }
 
         /*
