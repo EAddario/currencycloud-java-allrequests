@@ -604,43 +604,6 @@ class CurrencyCloudEndpoints {
     }
 
     /*
-     * Find IBANs of Sub-Account(s)
-     * Returns an array containing all the IBANs of the sub-accounts linked to the logged in user.
-     */
-    static Ibans FindSubAccountIbans(CurrencyCloudClient client, Iban iban) {
-        Ibans findSubAccountIbans;
-        try {
-            final BackOffResult<Ibans> findSubAccountIbansResult = BackOff.<Ibans>builder()
-                    .withTask(() -> client.findSubAccountsIbans(iban, null))
-                    .execute();
-            findSubAccountIbans = findSubAccountIbansResult.data.orElse(new Ibans());
-            return findSubAccountIbans;
-        } catch (RuntimeException e) {
-            ErrorPrintLn("FindSubAccountIbans Exception: " + e.getMessage());
-            return new Ibans();
-        }
-    }
-
-    /*
-     * Retrieve IBANs of Sub-Account(s)
-     * Returns an object containing the details of the IBAN assigned to a specific sub-account linked to the
-     * logged in user.
-     */
-    static Ibans RetrieveSubAccountIbans(CurrencyCloudClient client, Iban iban) {
-        Ibans retrieveSubAccountIbans;
-        try {
-            final BackOffResult<Ibans> retrieveSubAccountIbansResult = BackOff.<Ibans>builder()
-                    .withTask(() -> client.retrieveSubAccountsIban(iban.getId(), null))
-                    .execute();
-            retrieveSubAccountIbans = retrieveSubAccountIbansResult.data.orElse(new Ibans());
-            return retrieveSubAccountIbans;
-        } catch (RuntimeException e) {
-            ErrorPrintLn("RetrieveSubAccountIbans Exception: " + e.getMessage());
-            return new Ibans();
-        }
-    }
-
-    /*
      * Find a Payment
      * Returns an array containing all payments matching the search criteria.
      */
@@ -1277,6 +1240,42 @@ class CurrencyCloudEndpoints {
         } catch (RuntimeException e) {
             ErrorPrintLn("CreateTransfer Exception: " + e.getMessage());
             return Transfer.create();
+        }
+    }
+
+    /*
+     * Find VANs
+     * Returns an object containing the details of the Virtual Accounts for the specified account.
+     */
+    static VirtualAccounts FindVirtualAccounts(CurrencyCloudClient client, VirtualAccount van) {
+        VirtualAccounts findVirtualAccounts;
+        try {
+            final BackOffResult<VirtualAccounts> findVirtualAccountsResult = BackOff.<VirtualAccounts>builder()
+                    .withTask(() -> client.findVirtualAccounts(null, null))
+                    .execute();
+            findVirtualAccounts = findVirtualAccountsResult.data.orElse(new VirtualAccounts());
+            return findVirtualAccounts;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("FindVirtualAccounts Exception: " + e.getMessage());
+            return new VirtualAccounts();
+        }
+    }
+
+    /*
+     * Retrieve VANs
+     * Returns an object containing the details of the Virtual Accounts attached to the authenticating user's account.
+     */
+    static VirtualAccounts RetrieveVirtualAccounts(CurrencyCloudClient client) {
+        VirtualAccounts retrieveVirtualAccounts;
+        try {
+            final BackOffResult<VirtualAccounts> retrieveVirtualAccountsResult = BackOff.<VirtualAccounts>builder()
+                    .withTask(() -> client.retrieveVirtualAccount(null))
+                    .execute();
+            retrieveVirtualAccounts = retrieveVirtualAccountsResult.data.orElse(new VirtualAccounts());
+            return retrieveVirtualAccounts;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("RetrieveVirtualAccounts Exception: " + e.getMessage());
+            return new VirtualAccounts();
         }
     }
 

@@ -247,15 +247,6 @@ public class AllRequests {
         Ibans foundIbans = FindIbans(client, iban);
         PrintLn("FindIBANs: " + foundIbans);
 
-        Ibans foundSubAccountIbans = FindSubAccountIbans(client, iban);
-        PrintLn("FindSubAccountIBANs: " + foundSubAccountIbans);
-
-        if (foundSubAccountIbans.getIbans() != null) {
-            iban.setId(foundSubAccountIbans.getIbans().iterator().next().getAccountId());
-            Ibans retrievedSubAccountIbans = RetrieveSubAccountIbans(client, iban);
-            PrintLn("RetrieveSubAccountIBAN: " + retrievedSubAccountIbans);
-        }
-
         /*
          * Payments API
          */
@@ -457,6 +448,16 @@ public class AllRequests {
         transfer.setId(createdTransfer.getId());
         Transfer retrievedTransfer = RetrieveTransfer(client, transfer);
         PrintLn("FindTransfer: " + retrievedTransfer);
+
+        /*
+         * Virtual Accounts API
+         */
+        VirtualAccount virtualAccount = VirtualAccount.create();
+        VirtualAccounts foundVirtualAccounts = FindVirtualAccounts(client, virtualAccount);
+        PrintLn("FindVirtualAccounts: " + foundVirtualAccounts);
+
+        VirtualAccounts retrievedVirtualAccounts = RetrieveVirtualAccounts(client);
+        PrintLn("RetrieveVirtualAccounts: " + retrievedVirtualAccounts);
 
         /*
          * Delete objects
