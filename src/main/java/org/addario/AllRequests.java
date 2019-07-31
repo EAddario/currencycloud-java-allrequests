@@ -456,9 +456,6 @@ public class AllRequests {
         VirtualAccounts foundVirtualAccounts = FindVirtualAccounts(client, virtualAccount);
         PrintLn("FindVirtualAccounts: " + foundVirtualAccounts);
 
-        VirtualAccounts retrievedVirtualAccounts = RetrieveVirtualAccounts(client);
-        PrintLn("RetrieveVirtualAccounts: " + retrievedVirtualAccounts);
-
         /*
          * Delete objects
          */

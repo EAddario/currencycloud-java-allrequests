@@ -647,7 +647,7 @@ class CurrencyCloudEndpoints {
         Payment retrievePayment;
         try {
             final BackOffResult<Payment> retrievePaymentResult = BackOff.<Payment>builder()
-                    .withTask(() -> client.retrievePayment(payment.getId()))
+                    .withTask(() -> client.retrievePayment(payment.getId(), null))
                     .execute();
             retrievePayment = retrievePaymentResult.data.orElse(Payment.create());
             return retrievePayment;
@@ -1257,24 +1257,6 @@ class CurrencyCloudEndpoints {
             return findVirtualAccounts;
         } catch (RuntimeException e) {
             ErrorPrintLn("FindVirtualAccounts Exception: " + e.getMessage());
-            return new VirtualAccounts();
-        }
-    }
-
-    /*
-     * Retrieve VANs
-     * Returns an object containing the details of the Virtual Accounts attached to the authenticating user's account.
-     */
-    static VirtualAccounts RetrieveVirtualAccounts(CurrencyCloudClient client) {
-        VirtualAccounts retrieveVirtualAccounts;
-        try {
-            final BackOffResult<VirtualAccounts> retrieveVirtualAccountsResult = BackOff.<VirtualAccounts>builder()
-                    .withTask(() -> client.retrieveVirtualAccount(null))
-                    .execute();
-            retrieveVirtualAccounts = retrieveVirtualAccountsResult.data.orElse(new VirtualAccounts());
-            return retrieveVirtualAccounts;
-        } catch (RuntimeException e) {
-            ErrorPrintLn("RetrieveVirtualAccounts Exception: " + e.getMessage());
             return new VirtualAccounts();
         }
     }
