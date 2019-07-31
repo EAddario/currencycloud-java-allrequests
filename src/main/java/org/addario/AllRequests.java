@@ -387,24 +387,29 @@ public class AllRequests {
         Settlements foundSettlements = FindSettlements(client, settlement);
         PrintLn("FindSettlements: " + "{\"settlements\":" + foundSettlements + "}");
 
-        Settlement createdSettlement = CreateSettlement(client, settlement);
-        PrintLn("CreateSettlement: " + createdSettlement);
+        if (foundSettlements.getSettlements() != null) {
+            Settlement createdSettlement = CreateSettlement(client, settlement);
+            PrintLn("CreateSettlement: " + createdSettlement);
 
-        settlement.setId(createdSettlement.getId());
-        Settlement retrievedSettlement = RetrieveSettlement(client, settlement);
-        PrintLn("RetrieveSettlement: " + retrievedSettlement);
+            settlement.setId(createdSettlement.getId());
+            Settlement retrievedSettlement = RetrieveSettlement(client, settlement);
+            PrintLn("RetrieveSettlement: " + retrievedSettlement);
 
-        Settlement addedConversionSettlement = AddConversionSettlement(client, createdSettlement, createdConversion);
-        PrintLn("AddConversionSettlement: " + addedConversionSettlement);
+            Settlement addedConversionSettlement = AddConversionSettlement(client, createdSettlement, createdConversion);
+            PrintLn("AddConversionSettlement: " + addedConversionSettlement);
 
-        Settlement releasedSettlement = ReleaseSettlement(client, addedConversionSettlement);
-        PrintLn("ReleaseSettlement: " + releasedSettlement);
+            Settlement releasedSettlement = ReleaseSettlement(client, addedConversionSettlement);
+            PrintLn("ReleaseSettlement: " + releasedSettlement);
 
-        Settlement unreleasedSettlement = UnreleaseSettlement(client, releasedSettlement);
-        PrintLn("UnreleaseSettlement: " + unreleasedSettlement);
+            Settlement unreleasedSettlement = UnreleaseSettlement(client, releasedSettlement);
+            PrintLn("UnreleaseSettlement: " + unreleasedSettlement);
 
-        Settlement removedConversionSettlement = RemoveConversionSettlement(client, createdSettlement, createdConversion);
-        PrintLn("RemoveConversionSettlement: " + removedConversionSettlement);
+            Settlement removedConversionSettlement = RemoveConversionSettlement(client, createdSettlement, createdConversion);
+            PrintLn("RemoveConversionSettlement: " + removedConversionSettlement);
+
+            Settlement deletedSettlement = DeleteSettlement(client, createdSettlement);
+            PrintLn("DeleteSettlement: " + deletedSettlement);
+        }
 
         /*
          * Transactions API
@@ -459,9 +464,6 @@ public class AllRequests {
         /*
          * Delete objects
          */
-        Settlement deletedSettlement = DeleteSettlement(client, createdSettlement);
-        PrintLn("DeleteSettlement: " + deletedSettlement);
-
         Payment deletedPayment = DeletePayment(client, createdPayment);
         PrintLn("DeletePayment: " + deletedPayment);
 
