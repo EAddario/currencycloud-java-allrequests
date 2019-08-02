@@ -350,6 +350,9 @@ public class AllRequests {
         List<PaymentPurposeCode> paymentPurposeCodes = PayPurposeCodes(client, "INR", "IN", null);
         PrintLn("PaymentPurposeCodes: " + "{\"purpose_codes\":" + paymentPurposeCodes + "}");
 
+        BankDetails bankDetails = BankDetails(client, "iban", "GB19TCCL00997901654515");
+        PrintLn("BankDetails: " + bankDetails);
+
         /*
          * Report Requests
          */

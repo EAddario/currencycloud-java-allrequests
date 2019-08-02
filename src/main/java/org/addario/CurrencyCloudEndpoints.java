@@ -883,6 +883,24 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Get Bank Details
+     * Returns the related bank details for the given account reference.
+     */
+    static BankDetails BankDetails(CurrencyCloudClient client, String identifierType, String identifierValue) {
+        BankDetails bankDetails;
+        try {
+            final BackOffResult<BankDetails> bankDetailsResult = BackOff.<BankDetails>builder()
+                    .withTask(() -> client.bankDetails(identifierType, identifierValue))
+                    .execute();
+            bankDetails = bankDetailsResult.data.orElse(new BankDetails());
+            return bankDetails;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("BankDetails Exception: " + e.getMessage());
+            return new BankDetails();
+        }
+    }
+
+    /*
      * Payer Required Details
      * Returns required payer details and their basic validation formats
      */
