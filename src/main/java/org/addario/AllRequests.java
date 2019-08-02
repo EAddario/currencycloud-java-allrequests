@@ -93,6 +93,14 @@ public class AllRequests {
         Account updatedAccount = UpdateAccount(client, account);
         PrintLn("UpdateAccount: " + updatedAccount);
 
+        AccountPaymentChargesSetting chargesSetting = AccountPaymentChargesSetting.Create(currentAccount.getId());
+        AccountPaymentChargesSettings retrievedAccountsPaymentChargeSettings = RetrievePaymentChargesSettings(client, chargesSetting);
+        PrintLn("Retrieved Accounts Payment Charge Settings: " + retrievedAccountsPaymentChargeSettings);
+
+        chargesSetting = retrievedAccountsPaymentChargeSettings.getPaymentChargesSettings().iterator().next();
+        AccountPaymentChargesSetting updatedAccountsPaymentChargeSettings = UpdatePaymentChargesSettings(client, chargesSetting);
+        PrintLn("Updated Accounts Payment Charge Settings: " + updatedAccountsPaymentChargeSettings);
+
         /*
          * Balances API
          */

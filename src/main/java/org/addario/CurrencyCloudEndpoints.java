@@ -148,6 +148,42 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Get Payment Charges Settings
+     * Retrieve payment charges settings for given account.
+     */
+    static AccountPaymentChargesSettings RetrievePaymentChargesSettings(CurrencyCloudClient client, AccountPaymentChargesSetting chargesSetting) {
+        AccountPaymentChargesSettings retrievePaymentChargesSettings;
+        try {
+            final BackOffResult<AccountPaymentChargesSettings> retrievePaymentChargesSettingsResult = BackOff.<AccountPaymentChargesSettings>builder()
+                    .withTask(() -> client.retrieveAccountsPaymentChargeSettings(chargesSetting.getAccountId()))
+                    .execute();
+            retrievePaymentChargesSettings = retrievePaymentChargesSettingsResult.data.orElse(new AccountPaymentChargesSettings());
+            return retrievePaymentChargesSettings;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("RetrievePaymentChargesSettings Exception: " + e.getMessage());
+            return new AccountPaymentChargesSettings();
+        }
+    }
+
+    /*
+     * Manage Account Payment Charges Settings
+     * Manage given Account's Payment Charge Settings (enable, disable, set default).
+     */
+    static AccountPaymentChargesSetting UpdatePaymentChargesSettings(CurrencyCloudClient client, AccountPaymentChargesSetting chargesSetting) {
+        AccountPaymentChargesSetting updatePaymentChargesSettings;
+        try {
+            final BackOffResult<AccountPaymentChargesSetting> updatePaymentChargesSettingsResult = BackOff.<AccountPaymentChargesSetting>builder()
+                    .withTask(() -> client.updateAccountsPaymentChargeSetting(chargesSetting))
+                    .execute();
+            updatePaymentChargesSettings = updatePaymentChargesSettingsResult.data.orElse(AccountPaymentChargesSetting.Create());
+            return updatePaymentChargesSettings;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("UpdatePaymentChargesSettings Exception: " + e.getMessage());
+            return AccountPaymentChargesSetting.Create();
+        }
+    }
+
+    /*
      * Find Balances
      * Search for a range of historical balances and receive a paginated response.
      */
