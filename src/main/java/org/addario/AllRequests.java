@@ -41,17 +41,12 @@ public class AllRequests {
     static ArrayList<String> colors = new ArrayList<>();
 
     public static void main(String[] args) {
-        colors.add(BLACK_BOLD);
-        colors.add(BLUE_BOLD);
-        colors.add(CYAN_BOLD);
-        colors.add(GREEN_BOLD);
-        colors.add(PURPLE_BOLD);
-        colors.add(RED_BOLD);
         colors.add(WHITE_BOLD);
         colors.add(YELLOW_BOLD);
-
-        //ToDo: Comment out to run chosen subset of calls only. Program exits after SomeRequests execution
-        //SomeRequests.Run(args[0], args[1]);
+        colors.add(GREEN_BOLD);
+        colors.add(CYAN_BOLD);
+        colors.add(BLUE_BOLD);
+        colors.add(PURPLE_BOLD);
 
         /*
          * Authenticate
@@ -59,17 +54,20 @@ public class AllRequests {
         PrintLn("Login Id: " + args[0] + " API Key: " + args[1]);
         CurrencyCloudClient client = Authenticate(args[0], args[1]);
 
+        //ToDo: Comment out to run chosen subset of calls only. Program exits after SomeRequests execution
+        //SomeRequests.Run(args[0], args[1], client);
+
         /*
          * Accounts API
          */
         Account currentAccount = CurrentAccount(client);
-        PrintLn("CurrentAccount: " + currentAccount);
+        PrintLn("Current Account: " + currentAccount);
 
         Account account = Account.create();
         Accounts foundAccounts = FindAccounts(client, account);
-        PrintLn("FindAccounts: " + foundAccounts);
+        PrintLn("Find Accounts: " + foundAccounts);
 
-        account.setAccountName("Currencycloud Development");
+        account.setAccountName("Wirecard Development");
         account.setLegalEntityType("individual");
         account.setStreet("12 Steward St");
         account.setCity("London");
@@ -80,24 +78,26 @@ public class AllRequests {
         account.setPhoneTrading(true);
 
         Account createdAccount = CreateAccount(client, account);
-        PrintLn("CreateAccount: " + createdAccount);
+        PrintLn("Create Account: " + createdAccount);
 
         account = Account.create();
         account.setId(createdAccount.getId());
         Account retrievedAccount = RetrieveAccount(client, account);
-        PrintLn("RetrieveAccount: " + retrievedAccount);
+        PrintLn("Retrieve Account: " + retrievedAccount);
 
         account.setYourReference("ACCT-REF-" + new Random().nextInt(1000) + 1000);
         account.setIdentificationType("passport");
         account.setIdentificationValue("925665416");
         Account updatedAccount = UpdateAccount(client, account);
-        PrintLn("UpdateAccount: " + updatedAccount);
+        PrintLn("Update Account: " + updatedAccount);
 
-        AccountPaymentChargesSetting chargesSetting = AccountPaymentChargesSetting.Create(currentAccount.getId());
+        AccountPaymentChargesSetting chargesSetting = AccountPaymentChargesSetting.create(currentAccount.getId());
         AccountPaymentChargesSettings retrievedAccountsPaymentChargeSettings = RetrievePaymentChargesSettings(client, chargesSetting);
         PrintLn("Retrieved Accounts Payment Charge Settings: " + retrievedAccountsPaymentChargeSettings);
 
         chargesSetting = retrievedAccountsPaymentChargeSettings.getPaymentChargesSettings().iterator().next();
+        chargesSetting.setDefault(false);
+        chargesSetting.setEnabled(false);
         AccountPaymentChargesSetting updatedAccountsPaymentChargeSettings = UpdatePaymentChargesSettings(client, chargesSetting);
         PrintLn("Updated Accounts Payment Charge Settings: " + updatedAccountsPaymentChargeSettings);
 
@@ -106,12 +106,18 @@ public class AllRequests {
          */
         Balance balance = Balance.create();
         Balances foundBalances = FindBalances(client, balance);
-        PrintLn("FindBalances: " + foundBalances);
+        PrintLn("Find Balances: " + foundBalances);
 
         if (foundBalances.getBalances() != null) {
             balance.setCurrency(foundBalances.getBalances().iterator().next().getCurrency());
             Balance retrieveBalance = RetrieveBalance(client, balance);
-            PrintLn("RetrieveBalance: " + retrieveBalance);
+            PrintLn("Retrieve Balance: " + retrieveBalance);
+
+            for (Balance retrievedBalance : foundBalances.getBalances()) {
+                MarginBalanceTopUp marginBalanceTopUp = TopUpMarginBalance(client,
+                        MarginBalanceTopUp.create(retrievedBalance.getCurrency(), retrievedBalance.getAmount().add(new BigDecimal("1234.56")) ));
+                PrintLn("Top-Up Margin Balance: " + marginBalanceTopUp);
+            }
         }
 
         /*
@@ -119,7 +125,7 @@ public class AllRequests {
          */
         Beneficiary beneficiary = Beneficiary.create();
         Beneficiaries foundBeneficiaries = FindBeneficiaries(client, beneficiary);
-        PrintLn("FindBeneficiaries: " + foundBeneficiaries);
+        PrintLn("Find Beneficiaries: " + foundBeneficiaries);
 
         beneficiary.setBankCountry("IT");
         beneficiary.setCurrency("EUR");
@@ -142,49 +148,49 @@ public class AllRequests {
         beneficiary.setBeneficiaryCity("Napoli");
         beneficiary.setBeneficiaryPostcode("80135");
         beneficiary.setBeneficiaryStateOrProvince("Provincia di Napoli");
-        List<String> payementTypes = new ArrayList<>();
-        payementTypes.add("priority");
-        payementTypes.add("regular");
-        beneficiary.setPaymentTypes(payementTypes);
+        List<String> paymentTypes = new ArrayList<>();
+        paymentTypes.add("priority");
+        paymentTypes.add("regular");
+        beneficiary.setPaymentTypes(paymentTypes);
 
         Beneficiary validatedBeneficiary = ValidateBeneficiary(client, beneficiary);
-        PrintLn("ValidateBeneficiary: " + validatedBeneficiary);
+        PrintLn("Validate Beneficiary: " + validatedBeneficiary);
 
         beneficiary.setBankAccountHolderName("Dame Tamara Carlton");
         beneficiary.setName("Fulcrum Partnership");
         Beneficiary createdBeneficiary = CreateBeneficiary(client, beneficiary);
-        PrintLn("CreateBeneficiary: " + createdBeneficiary);
+        PrintLn("Create Beneficiary: " + createdBeneficiary);
 
         Beneficiary retrievedBeneficiary = RetrieveBeneficiary(client, createdBeneficiary);
-        PrintLn("RetrieveBeneficiary: " + retrievedBeneficiary);
+        PrintLn("Retrieve Beneficiary: " + retrievedBeneficiary);
 
         beneficiary = Beneficiary.create();
         beneficiary.setId(retrievedBeneficiary.getId());
-        beneficiary.setEmail("development@currencycloud.com");
+        beneficiary.setEmail("development@wirecard.com");
         beneficiary.setBeneficiaryDateOfBirth(new GregorianCalendar(1968, Calendar.MARCH, 23).getTime());
         beneficiary.setBeneficiaryIdentificationType("passport");
         beneficiary.setBeneficiaryIdentificationValue("AA5275702");
         Beneficiary updatedBeneficiary = UpdateBeneficiary(client, beneficiary);
-        PrintLn("UpdateBeneficiary: " + updatedBeneficiary);
+        PrintLn("Update Beneficiary: " + updatedBeneficiary);
 
         /*
          * Contacts API
          */
         Contact contact = Contact.create();
         Contacts foundContacts = FindContacts(client, contact);
-        PrintLn("FindContacts: " + foundContacts);
+        PrintLn("Find Contacts: " + foundContacts);
 
         Contact currentContact = CurrentContact(client);
-        PrintLn("CurrentContact: " + currentContact);
+        PrintLn("Current Contact: " + currentContact);
 
         contact.setAccountId(createdAccount.getId());
-        contact.setFirstName("Currencycloud");
+        contact.setFirstName("Wirecard");
         contact.setLastName("Development");
-        contact.setEmailAddress("development." + RandomChars(6) + "@currencycloud.com");
+        contact.setEmailAddress("development." + RandomChars(6) + "@wirecard.com");
         contact.setPhoneNumber("+44 20 3326 8173");
         contact.setDateOfBirth(new GregorianCalendar(1968, Calendar.MARCH, 23).getTime());
         Contact createdContact = CreateContact(client, contact);
-        PrintLn("CreateContact: " + createdContact);
+        PrintLn("Create Contact: " + createdContact);
 
         contact = Contact.create();
         contact.setId(createdContact.getId());
@@ -193,110 +199,136 @@ public class AllRequests {
         contact.setLocale("en-GB");
         contact.setTimezone("Europe/London");
         Contact updatedContact = UpdateContact(client, contact);
-        PrintLn("UpdateContact: " + updatedContact);
+        PrintLn("Update Contact: " + updatedContact);
 
         Contact retrievedContact = RetrieveContact(client, contact);
-        PrintLn("RetrieveContact: " + retrievedContact);
+        PrintLn("Retrieve Contact: " + retrievedContact);
 
         /*
          * Conversions API
          */
         Conversion conversion = Conversion.create();
         Conversions foundConversions = FindConversions(client, conversion);
-        PrintLn("FindConversions: " + foundConversions);
+        PrintLn("Find Conversions: " + foundConversions);
 
         conversion.setBuyCurrency("EUR");
         conversion.setSellCurrency("GBP");
         conversion.setFixedSide("buy");
-        conversion.setAmount(new BigDecimal(new Random().nextFloat() * 5000 + 1000).setScale(2, RoundingMode.HALF_UP));
+        conversion.setAmount(BigDecimal.valueOf(new Random().nextFloat() * 5000 + 1000).setScale(2, RoundingMode.HALF_UP));
         conversion.setReason("Invoice Payment");
         conversion.setTermAgreement(true);
         conversion.setUniqueRequestId(UUID.randomUUID().toString());
         Conversion createdConversion = CreateConversion(client, conversion);
-        PrintLn("CreateConversion: " + createdConversion);
+        PrintLn("Create Conversion: " + createdConversion);
 
         conversion = Conversion.create();
         conversion.setId(createdConversion.getId());
         Conversion retrievedConversion = RetrieveConversion(client, conversion);
-        PrintLn("RetrieveConversion: " + retrievedConversion);
+        PrintLn("Retrieve Conversion: " + retrievedConversion);
 
         ConversionDateChange dateChange = ConversionDateChange.create(
                 createdConversion.getId(),
                 new Date(System.currentTimeMillis() + (86400 * 7 * 1000)) //7 days from now
         );
         ConversionDateChange quotedDateChangeConversion = QuoteDateChangeConversion(client, dateChange);
-        PrintLn("QuoteDateChangeConversion: " + quotedDateChangeConversion);
+        PrintLn("Quote Date Change Conversion: " + quotedDateChangeConversion);
 
         ConversionDateChange dateChangedConversion = DateChangeConversion(client, dateChange);
-        PrintLn("DateChangeConversion: " + dateChangedConversion);
+        PrintLn("Date Change Conversion: " + dateChangedConversion);
 
         ConversionSplit splitPreview = ConversionSplit.create(
                 createdConversion.getId(),
                 createdConversion.getClientBuyAmount().multiply(new BigDecimal("0.5"), new MathContext(2))
         );
         ConversionSplit splitPreviewConversion = SplitPreviewConversion(client,splitPreview);
-        PrintLn("SplitPreviewConversion: " + splitPreviewConversion);
+        PrintLn("Split Preview Conversion: " + splitPreviewConversion);
 
         ConversionSplit splittedConversion = SplitConversion(client,splitPreview);
-        PrintLn("SplitConversion: " + splittedConversion);
+        PrintLn("Split Conversion: " + splittedConversion);
 
         ConversionSplitHistory splitHistory = ConversionSplitHistory.create(createdConversion.getId());
         ConversionSplitHistory splittedHistoryConversion = SplitHistoryConversion(client, splitHistory);
-        PrintLn("splittedHistoryConversion" + splittedHistoryConversion);
+        PrintLn("splitted History Conversion" + splittedHistoryConversion);
 
         ConversionProfitAndLoss profitAndLoss = ConversionProfitAndLoss.create();
         ConversionProfitAndLosses profitAndLossesConversion = ProfitAndLossesConversion(client, profitAndLoss);
-        PrintLn("ProfitAndLossesConversion" + profitAndLossesConversion);
+        PrintLn("Profit And Losses Conversion" + profitAndLossesConversion);
+
+        /*
+         * Funding Accounts API
+         */
+        FundingAccount fundingAccount = FundingAccount.create("GBP");
+        FundingAccounts foundFundingAccounts = FindFundingAccounts(client, fundingAccount);
+        PrintLn("Find Funding Accounts: " + foundFundingAccounts);
 
         /*
          * IBANs API
          */
         Iban iban = Iban.create();
         Ibans foundIbans = FindIbans(client, iban);
-        PrintLn("FindIBANs: " + foundIbans);
+        PrintLn("Find IBANs: " + foundIbans);
 
         /*
          * Payments API
          */
         Payment payment = Payment.create();
         Payments foundPayments = FindPayments(client, payment);
-        PrintLn("FindPayments: " + foundPayments);
+        PrintLn("Find Payments: " + foundPayments);
+
+        List<String> payerAddress = new ArrayList<>();
+        payerAddress.add("Piazza Museo, n° 19");
+        Payer payer = Payer.create();
+        payer.setLegalEntityType("individual");
+        payer.setAddress(payerAddress);
+        payer.setCity("Napoli");
+        payer.setCountry("IT");
+        payer.setIdentificationType("passport");
+        payer.setIdentificationValue("23031968");
+        payer.setFirstName("Francesco");
+        payer.setLastName("Bianco");
+        payer.setDateOfBirth(new GregorianCalendar(1968, Calendar.MARCH, 23).getTime());
 
         payment.setCurrency("EUR");
         payment.setBeneficiaryId(beneficiary.getId());
-        payment.setAmount(splittedConversion.getParentConversion().getBuyAmount());
+        payment.setAmount(new BigDecimal("123.45"));
         payment.setReason("Invoice");
+        payment.setReference("REF-INV-" + (new Random().nextInt(1000) + 1000));
+        payment.setUniqueRequestId(UUID.randomUUID().toString());
+        Payment createdPaymentPayer = CreatePayment(client, payment, payer);
+        PrintLn("Create Payment with Payer: " + createdPaymentPayer);
+
+        payment.setAmount(splittedConversion.getParentConversion().getBuyAmount());
         payment.setReference("REF-INV-" + (new Random().nextInt(1000) + 1000));
         payment.setPaymentType("regular");
         payment.setConversionId(createdConversion.getId());
         payment.setUniqueRequestId(UUID.randomUUID().toString());
-        Payment createdPayment = CreatePayment(client, payment);
-        PrintLn("CreatePayment: " + createdPayment);
+        Payment createdPaymentConversion = CreatePayment(client, payment);
+        PrintLn("Create Payment with Conversion: " + createdPaymentConversion);
 
         payment = Payment.create();
-        payment.setId(createdPayment.getId());
+        payment.setId(createdPaymentConversion.getId());
         Payment retrievedPayment = RetrievePayment(client, payment);
-        PrintLn("RetrievePayment: " + retrievedPayment);
+        PrintLn("Retrieve Payment: " + retrievedPayment);
 
         PaymentSubmission retrievedPaymentSubmission = RetrievePaymentSubmission(client, payment);
-        PrintLn("RetrievePaymentSubmission: " + retrievedPaymentSubmission);
+        PrintLn("Retrieve Payment Submission: " + retrievedPaymentSubmission);
 
         payment.setWithDeleted(false);
         payment.setReference("REF-INV-" + new Random().nextInt(1000));
         Payment updatedPayment = UpdatePayment(client, payment);
-        PrintLn("UpdatePayment: " + updatedPayment);
+        PrintLn("Update Payment: " + updatedPayment);
 
         PaymentConfirmation confirmation = PaymentConfirmation.create(retrievedPayment.getId());
         PaymentConfirmation retrievedPaymentConfirmation = RetrievePaymentConfirmation(client, confirmation);
-        PrintLn("RetrievePaymentConfirmation: " + retrievedPaymentConfirmation);
+        PrintLn("Retrieve Payment Confirmation: " + retrievedPaymentConfirmation);
 
         /*
          * Payers API
          */
-        Payer payer = Payer.create();
-        payer.setId(createdPayment.getPayerId());
+        payer = Payer.create();
+        payer.setId(createdPaymentPayer.getPayerId());
         Payer retrievePayer = RetrievePayer(client, payer);
-        PrintLn("RetrievePayer: " + retrievePayer);
+        PrintLn("Retrieve Payer: " + retrievePayer);
 
         /*
          * Rates API
@@ -305,9 +337,9 @@ public class AllRequests {
         rate.setClientBuyCurrency("EUR");
         rate.setClientSellCurrency("GBP");
         rate.setFixedSide("buy");
-        rate.setClientBuyAmount(new BigDecimal(new Random().nextFloat() * 5000).setScale(2, RoundingMode.HALF_UP));
+        rate.setClientBuyAmount(BigDecimal.valueOf(new Random().nextFloat() * 5000).setScale(2, RoundingMode.HALF_UP));
         DetailedRate detailedRate = DetailedRates(client, rate);
-        PrintLn("DetailedRate: " + detailedRate);
+        PrintLn("Detailed Rate: " + detailedRate);
 
         List<String> pairs = new ArrayList<>();
         pairs.add("GBPEUR");
@@ -320,7 +352,7 @@ public class AllRequests {
         pairs.add("AUDGBP");
         pairs.add("FOOBAR");
         Rates rates = FindRates(client, pairs);
-        PrintLn("FindRates: " + rates);
+        PrintLn("Find Rates: " + rates);
 
         /*
          * Reference API
@@ -330,31 +362,31 @@ public class AllRequests {
         beneficiary.setBankCountry("IT");
         beneficiary.setBeneficiaryCountry("IT");
         List<Map<String, String>> beneficiaryRequiredDetails = BeneficiaryRequiredDetails(client, beneficiary);
-        PrintLn("BeneficiaryRequiredDetails: {\"details\":" + beneficiaryRequiredDetails + "}");
+        PrintLn("Beneficiary Required Details: {\"details\":" + beneficiaryRequiredDetails + "}");
 
         ConversionDates conversionDates = ConversionDates(client, "GBPEUR", null);
-        PrintLn("ConversionDates: " + conversionDates);
+        PrintLn("Conversion Dates: " + conversionDates);
 
         List<Currency> availableCurrencies = AvailableCurrencies(client);
-        PrintLn("AvailableCurrencies: " + "{\"currencies\":" + availableCurrencies + "}");
+        PrintLn("Available Currencies: " + "{\"currencies\":" + availableCurrencies + "}");
 
         List<PayerRequiredDetail> payerRequiredDetails = PayerRequiredDetails(client, "GB", "individual", "regular");
-        PrintLn("PayerRequiredDetails: " + "{\"details\":" + payerRequiredDetails + "}");
+        PrintLn("Payer Required Details: " + "{\"details\":" + payerRequiredDetails + "}");
 
         PaymentDates paymentDates = PaymentDates(client, "EUR", new Date());
-        PrintLn("PaymentDates: " + paymentDates);
+        PrintLn("Payment Dates: " + paymentDates);
 
         List<SettlementAccount> settlementAccounts = SettlementAccounts(client, null, null);
-        PrintLn("SettlementAccounts: " + "{\"settlement_accounts\":" + settlementAccounts + "}");
+        PrintLn("Settlement Accounts: " + "{\"settlement_accounts\":" + settlementAccounts + "}");
 
         List<PaymentPurposeCode> paymentPurposeCodes = PayPurposeCodes(client, "INR", "IN", null);
-        PrintLn("PaymentPurposeCodes: " + "{\"purpose_codes\":" + paymentPurposeCodes + "}");
+        PrintLn("Payment Purpose Codes: " + "{\"purpose_codes\":" + paymentPurposeCodes + "}");
 
         BankDetails bankDetails = BankDetails(client, "iban", "GB19TCCL00997901654515");
-        PrintLn("BankDetails: " + bankDetails);
+        PrintLn("Bank Details: " + bankDetails);
 
         /*
-         * Report Requests
+         * Report Requests API
          */
         ConversionReport conversionReport = ConversionReport.create();
         conversionReport.setDescription("Conversion Report: " + RandomChars(10));
@@ -366,7 +398,7 @@ public class AllRequests {
         conversionReport.setConversionDateTo(new GregorianCalendar(2018, Calendar.DECEMBER, 31).getTime());
         conversionReport.setUniqueRequestId(UUID.randomUUID().toString());
         ConversionReport foundConversionReport = CreateConversionReport(client, conversionReport);
-        PrintLn("CreateConversionReport: " + foundConversionReport);
+        PrintLn("Create Conversion Report: " + foundConversionReport);
 
         PaymentReport paymentReport = PaymentReport.create();
         paymentReport.setDescription("Payment Report: " + RandomChars(10));
@@ -381,45 +413,45 @@ public class AllRequests {
 
         ReportRequest retriveReport = ReportRequest.create(foundConversionReport.getId());
         ReportRequest retrievedConversionReportRequest = RetrieveReportRequest(client, retriveReport);
-        PrintLn("RetrieveConversionReportRequest: " + retrievedConversionReportRequest);
+        PrintLn("Retrieve Conversion Report Request: " + retrievedConversionReportRequest);
 
         retriveReport = ReportRequest.create(foundPaymentReport.getId());
         ReportRequest retrievedPaymentReportRequest = RetrieveReportRequest(client, retriveReport);
-        PrintLn("RetrievePaymentReportRequest: " + retrievedPaymentReportRequest);
+        PrintLn("Retrieve Payment Report Request: " + retrievedPaymentReportRequest);
 
         ReportRequest findReports = ReportRequest.create();
         ReportRequests foundReportRequest = FindReportRequests(client, findReports);
-        PrintLn("FindReportRequests: " + foundReportRequest);
+        PrintLn("Find Report Requests: " + foundReportRequest);
 
         /*
          * Settlements API
          */
         Settlement settlement = Settlement.create();
         Settlements foundSettlements = FindSettlements(client, settlement);
-        PrintLn("FindSettlements: " + "{\"settlements\":" + foundSettlements + "}");
+        PrintLn("Find Settlements: " + "{\"settlements\":" + foundSettlements + "}");
 
         if (foundSettlements.getSettlements() != null) {
             Settlement createdSettlement = CreateSettlement(client, settlement);
-            PrintLn("CreateSettlement: " + createdSettlement);
+            PrintLn("Create Settlement: " + createdSettlement);
 
             settlement.setId(createdSettlement.getId());
             Settlement retrievedSettlement = RetrieveSettlement(client, settlement);
-            PrintLn("RetrieveSettlement: " + retrievedSettlement);
+            PrintLn("Retrieve Settlement: " + retrievedSettlement);
 
             Settlement addedConversionSettlement = AddConversionSettlement(client, createdSettlement, createdConversion);
-            PrintLn("AddConversionSettlement: " + addedConversionSettlement);
+            PrintLn("Add Conversion Settlement: " + addedConversionSettlement);
 
             Settlement releasedSettlement = ReleaseSettlement(client, addedConversionSettlement);
-            PrintLn("ReleaseSettlement: " + releasedSettlement);
+            PrintLn("Release Settlement: " + releasedSettlement);
 
             Settlement unreleasedSettlement = UnreleaseSettlement(client, releasedSettlement);
-            PrintLn("UnreleaseSettlement: " + unreleasedSettlement);
+            PrintLn("Unrelease Settlement: " + unreleasedSettlement);
 
             Settlement removedConversionSettlement = RemoveConversionSettlement(client, createdSettlement, createdConversion);
-            PrintLn("RemoveConversionSettlement: " + removedConversionSettlement);
+            PrintLn("Remove Conversion Settlement: " + removedConversionSettlement);
 
             Settlement deletedSettlement = DeleteSettlement(client, createdSettlement);
-            PrintLn("DeleteSettlement: " + deletedSettlement);
+            PrintLn("Delete Settlement: " + deletedSettlement);
         }
 
         /*
@@ -427,16 +459,16 @@ public class AllRequests {
          */
         Transaction transaction = Transaction.create();
         Transactions foundTransactions = FindTrasactions(client, transaction);
-        PrintLn("FindTransaction: " + foundTransactions);
+        PrintLn("Find Transaction: " + foundTransactions);
 
         if (foundTransactions.getTransactions() != null) {
             transaction.setId(foundTransactions.getTransactions().iterator().next().getId());
             Transaction retrievedTransaction = RetrieveTrasaction(client, transaction);
-            PrintLn("RetrieveTransaction: " + retrievedTransaction);
+            PrintLn("Retrieve Transaction: " + retrievedTransaction);
 
             SenderDetails details = SenderDetails.create(retrievedTransaction.getId());
             SenderDetails retrievedSenderDetails = RetrieveSenderDetails(client, details);
-            PrintLn("RetrieveSenderDetails: " + retrievedSenderDetails);
+            PrintLn("Retrieve Sender Details: " + retrievedSenderDetails);
         }
 
         /*
@@ -444,7 +476,7 @@ public class AllRequests {
          */
         Transfer transfer = Transfer.create();
         Transfers foundTransfers = FindTransfers(client, transfer);
-        PrintLn("FindTransfers: " + "{\"transfers\":" + foundTransfers + "}");
+        PrintLn("Find Transfers: " + "{\"transfers\":" + foundTransfers + "}");
 
         Iterator<Account> iter = foundAccounts.getAccounts().iterator();
         Account sourceAccount = iter.next();
@@ -452,43 +484,46 @@ public class AllRequests {
         transfer.setSourceAccountId(sourceAccount.getId());
         transfer.setDestinationAccountId(destinationAccount.getId());
         transfer.setCurrency("GBP");
-        transfer.setAmount(new BigDecimal(new Random().nextFloat() * 1000 + 1000).setScale(2, RoundingMode.HALF_UP));
+        transfer.setAmount(BigDecimal.valueOf(new Random().nextFloat() * 1000 + 1000).setScale(2, RoundingMode.HALF_UP));
         Transfer createdTransfer = CreateTransfer(client, transfer);
-        PrintLn("CreateTransfer: " + createdTransfer);
+        PrintLn("Create Transfer: " + createdTransfer);
 
         transfer.setSourceAccountId(destinationAccount.getId());
         transfer.setDestinationAccountId(sourceAccount.getId());
         Transfer reversedTransfer = CreateTransfer(client, transfer);
-        PrintLn("ReverseTransfer: " + reversedTransfer);
+        PrintLn("Reverse Transfer: " + reversedTransfer);
 
         transfer.setId(createdTransfer.getId());
         Transfer retrievedTransfer = RetrieveTransfer(client, transfer);
-        PrintLn("FindTransfer: " + retrievedTransfer);
+        PrintLn("Find Transfer: " + retrievedTransfer);
 
         /*
          * Virtual Accounts API
          */
         VirtualAccount virtualAccount = VirtualAccount.create();
         VirtualAccounts foundVirtualAccounts = FindVirtualAccounts(client, virtualAccount);
-        PrintLn("FindVirtualAccounts: " + foundVirtualAccounts);
+        PrintLn("Find Virtual Accounts: " + foundVirtualAccounts);
 
         /*
          * Delete objects
          */
-        Payment deletedPayment = DeletePayment(client, createdPayment);
-        PrintLn("DeletePayment: " + deletedPayment);
+        Payment deletedPayment = DeletePayment(client, createdPaymentPayer);
+        PrintLn("Delete Payment with Payer: " + deletedPayment);
+
+        deletedPayment = DeletePayment(client, createdPaymentConversion);
+        PrintLn("Delete Payment with Conversion: " + deletedPayment);
 
         ConversionCancellation cancellation = ConversionCancellation.create();
         cancellation.setId(splittedConversion.getChildConversion().getId());
         ConversionCancellation cancelledConversion = CancellationConversion(client, cancellation);
-        PrintLn("ChildCancellationConversion: " + cancelledConversion);
+        PrintLn("Child Cancellation Conversion: " + cancelledConversion);
 
         cancellation.setId(splittedConversion.getParentConversion().getId());
         cancelledConversion = CancellationConversion(client, cancellation);
-        PrintLn("ParentCancellationConversion: " + cancelledConversion);
+        PrintLn("Parent Cancellation Conversion: " + cancelledConversion);
 
         Beneficiary deletedBeneficiary = DeleteBeneficiary(client, createdBeneficiary);
-        PrintLn("DeleteBeneficiary: " + deletedBeneficiary);
+        PrintLn("Delete Beneficiary: " + deletedBeneficiary);
 
         /*
          * Logoff
