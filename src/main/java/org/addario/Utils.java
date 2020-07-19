@@ -39,7 +39,7 @@ class Utils {
     }
 
     static void ErrorPrintLn(String text) {
-        System.out.println(RED_BACKGROUND + BLACK_BOLD + text + RESET);
+        System.out.println(RED_BOLD + text + RESET);
     }
 
     static void PrintLn(String text) {
