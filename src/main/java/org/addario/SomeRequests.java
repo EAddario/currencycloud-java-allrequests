@@ -24,17 +24,12 @@
 package org.addario;
 
 import com.currencycloud.client.CurrencyCloudClient;
-
-import static org.addario.CurrencyCloudEndpoints.Authenticate;
 import static org.addario.CurrencyCloudEndpoints.EndSession;
 import static org.addario.Utils.PrintLn;
 
 public class SomeRequests {
 
-    public static void Run(String loginId, String apiKey) {
-        PrintLn("Login Id: " + loginId + " API Key: " + apiKey);
-        CurrencyCloudClient client = Authenticate(loginId, apiKey);
-        PrintLn("Logged In");
+    public static void Run(String loginId, String apiKey, CurrencyCloudClient client) {
 
         //TODO: Add API calls here
 
