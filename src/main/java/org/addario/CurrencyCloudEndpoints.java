@@ -175,11 +175,11 @@ class CurrencyCloudEndpoints {
             final BackOffResult<AccountPaymentChargesSetting> updatePaymentChargesSettingsResult = BackOff.<AccountPaymentChargesSetting>builder()
                     .withTask(() -> client.updateAccountsPaymentChargeSetting(chargesSetting))
                     .execute();
-            updatePaymentChargesSettings = updatePaymentChargesSettingsResult.data.orElse(AccountPaymentChargesSetting.Create());
+            updatePaymentChargesSettings = updatePaymentChargesSettingsResult.data.orElse(AccountPaymentChargesSetting.create());
             return updatePaymentChargesSettings;
         } catch (RuntimeException e) {
             ErrorPrintLn("UpdatePaymentChargesSettings Exception: " + e.getMessage());
-            return AccountPaymentChargesSetting.Create();
+            return AccountPaymentChargesSetting.create();
         }
     }
 
@@ -216,6 +216,25 @@ class CurrencyCloudEndpoints {
         } catch (RuntimeException e) {
             ErrorPrintLn("RetrieveBalance Exception: " + e.getMessage());
             return Balance.create();
+        }
+    }
+
+    /*
+     * Top Up Margin Balance
+     * Tops up the Margin Balance.
+     */
+
+    static MarginBalanceTopUp TopUpMarginBalance(CurrencyCloudClient client, MarginBalanceTopUp topUp) {
+        MarginBalanceTopUp topUpMarginBalance;
+        try {
+            final BackOffResult<MarginBalanceTopUp> topUpMarginBalanceResult = BackOff.<MarginBalanceTopUp>builder()
+                    .withTask(() -> client.topUpMarginBalance(topUp.getCurrency(), topUp.getAmount()))
+                    .execute();
+            topUpMarginBalance = topUpMarginBalanceResult.data.orElse(MarginBalanceTopUp.create());
+            return topUpMarginBalance;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("TopUpMarginBalance Exception: " + e.getMessage());
+            return MarginBalanceTopUp.create();
         }
     }
 
@@ -675,6 +694,20 @@ class CurrencyCloudEndpoints {
         }
     }
 
+    static Payment CreatePayment(CurrencyCloudClient client, Payment payment, Payer payer) {
+        Payment createPayment;
+        try {
+            final BackOffResult<Payment> createPaymentResult = BackOff.<Payment>builder()
+                    .withTask(() -> client.createPayment(payment, payer))
+                    .execute();
+            createPayment = createPaymentResult.data.orElse(Payment.create());
+            return createPayment;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("CreatePayment Exception: " + e.getMessage());
+            return Payment.create();
+        }
+    }
+
     /*
      * Retrieve a Payment
      * Returns an object containing the details of a payment.
@@ -797,7 +830,8 @@ class CurrencyCloudEndpoints {
                             rate.getClientSellCurrency(),
                             rate.getFixedSide(),
                             rate.getClientBuyAmount(),
-                            rate.getSettlementCutOffTime()
+                            rate.getSettlementCutOffTime(),
+                            "default"
                             )
                     )
                     .execute();
