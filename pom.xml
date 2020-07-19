@@ -24,12 +24,12 @@
         <dependency>
             <groupId>com.currencycloud.currencycloud-java</groupId>
             <artifactId>currencycloud-java</artifactId>
-            <version>3.2.2</version>
+            <version>3.6.3-ea</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -51,24 +51,24 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.8.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>2.22.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -81,16 +81,20 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <archive>
                             <manifest>
+                                <addClasspath>true</addClasspath>
+                                <classpathPrefix>lib/</classpathPrefix>
                                 <mainClass>org.addario.AllRequests</mainClass>
                             </manifest>
                         </archive>
                         <descriptorRefs>
                             <descriptorRef>jar-with-dependencies</descriptorRef>
                         </descriptorRefs>
+                        <finalName>currencycloud-AllRequests</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
                     </configuration>
                     <executions>
                         <execution>
