@@ -641,6 +641,24 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Funding Accounts
+     * Gets details of the SSIs that can be used to settle and collect funds in each available currency
+     */
+    static FundingAccounts FindFundingAccounts(CurrencyCloudClient client, FundingAccount fundingAccount) {
+        FundingAccounts findFundingAccounts;
+        try {
+            final BackOffResult<FundingAccounts> findFundingAccountsResult = BackOff.<FundingAccounts>builder()
+                    .withTask(() -> client.findFundingAccounts(fundingAccount.getCurrency(), fundingAccount.getAccountId(), fundingAccount.getPaymentType(), null))
+                    .execute();
+            findFundingAccounts = findFundingAccountsResult.data.orElse(new FundingAccounts());
+            return findFundingAccounts;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("FindFundingAccount Exception: " + e.getMessage());
+            return new FundingAccounts();
+        }
+    }
+
+    /*
      * Find IBANs
      * Returns an object containing the details of the IBAN assigned to the account.
      */
