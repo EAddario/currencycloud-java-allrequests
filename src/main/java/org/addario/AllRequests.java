@@ -314,6 +314,11 @@ public class AllRequests {
         Payment retrievedPayment = RetrievePayment(client, payment);
         PrintLn("Retrieve Payment: " + retrievedPayment);
 
+        ArrayList<String> paymentIds = new ArrayList<>();
+        paymentIds.add(retrievedPayment.getId());
+        PaymentAuthorisations authorisedPayments = AuthorisePayments(client, paymentIds);
+        PrintLn("Authorise Payments: " + retrievedPayment);
+
         PaymentSubmission retrievedPaymentSubmission = RetrievePaymentSubmission(client, payment);
         PrintLn("Retrieve Payment Submission: " + retrievedPaymentSubmission);
 

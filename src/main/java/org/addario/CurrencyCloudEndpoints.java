@@ -28,6 +28,7 @@ import com.currencycloud.client.backoff.BackOff;
 import com.currencycloud.client.backoff.BackOffResult;
 import com.currencycloud.client.model.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -691,6 +692,24 @@ class CurrencyCloudEndpoints {
         } catch (RuntimeException e) {
             ErrorPrintLn("FindPayments Exception: " + e.getMessage());
             return new Payments();
+        }
+    }
+
+    /*
+     * Authorise Payment
+     * Authorises a payment pending authorisation.
+     */
+    static PaymentAuthorisations AuthorisePayments(CurrencyCloudClient client, ArrayList<String> paymentIds) {
+        PaymentAuthorisations paymentAuthorisations;
+        try {
+            final BackOffResult<PaymentAuthorisations> paymentAuthorisationsResult = BackOff.<PaymentAuthorisations>builder()
+                    .withTask(() -> client.authorisePayment(paymentIds))
+                    .execute();
+            paymentAuthorisations = paymentAuthorisationsResult.data.orElse(new PaymentAuthorisations());
+            return paymentAuthorisations;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("AuthorisePayment Exception: " + e.getMessage());
+            return new PaymentAuthorisations();
         }
     }
 
