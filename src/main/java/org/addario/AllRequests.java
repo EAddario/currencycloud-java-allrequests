@@ -236,6 +236,10 @@ public class AllRequests {
         ConversionDateChange dateChangedConversion = DateChangeConversion(client, dateChange);
         PrintLn("Date Change Conversion: " + dateChangedConversion);
 
+        ConversionCancellationQuote cancelConversion = ConversionCancellationQuote.create(createdConversion.getId());
+        ConversionCancellationQuote quotedCancellationConversion = QuoteCancellationConversion(client, cancelConversion);
+        PrintLn("Conversion Cancellation Quote: " + quotedCancellationConversion);
+
         ConversionSplit splitPreview = ConversionSplit.create(
                 createdConversion.getId(),
                 createdConversion.getClientBuyAmount().multiply(new BigDecimal("0.5"), new MathContext(2))
@@ -309,6 +313,18 @@ public class AllRequests {
         payment.setId(createdPaymentConversion.getId());
         Payment retrievedPayment = RetrievePayment(client, payment);
         PrintLn("Retrieve Payment: " + retrievedPayment);
+
+        ArrayList<String> paymentIds = new ArrayList<>();
+        paymentIds.add(retrievedPayment.getId());
+        PaymentAuthorisations authorisedPayments = AuthorisePayments(client, paymentIds);
+        PrintLn("Authorise Payments: " + retrievedPayment);
+
+        PaymentDeliveryDate deliveryDate = PaymentDeliveryDate.create(retrievedPayment.getPaymentDate(),
+                retrievedPayment.getPaymentType(),
+                retrievedPayment.getCurrency(),
+                retrievedBeneficiary.getBankCountry());
+        PaymentDeliveryDate paymentDeliveryDate = PaymentDeliveryDate(client, deliveryDate);
+        PrintLn("Payment Delivery Date: " + paymentDeliveryDate);
 
         PaymentSubmission retrievedPaymentSubmission = RetrievePaymentSubmission(client, payment);
         PrintLn("Retrieve Payment Submission: " + retrievedPaymentSubmission);

@@ -28,6 +28,7 @@ import com.currencycloud.client.backoff.BackOff;
 import com.currencycloud.client.backoff.BackOffResult;
 import com.currencycloud.client.model.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -695,6 +696,24 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Authorise Payment
+     * Authorises a payment pending authorisation.
+     */
+    static PaymentAuthorisations AuthorisePayments(CurrencyCloudClient client, ArrayList<String> paymentIds) {
+        PaymentAuthorisations paymentAuthorisations;
+        try {
+            final BackOffResult<PaymentAuthorisations> paymentAuthorisationsResult = BackOff.<PaymentAuthorisations>builder()
+                    .withTask(() -> client.authorisePayment(paymentIds))
+                    .execute();
+            paymentAuthorisations = paymentAuthorisationsResult.data.orElse(new PaymentAuthorisations());
+            return paymentAuthorisations;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("AuthorisePayment Exception: " + e.getMessage());
+            return new PaymentAuthorisations();
+        }
+    }
+
+    /*
      * Create a Payment
      * Returns an object containing the details of the created payment.
      */
@@ -723,6 +742,27 @@ class CurrencyCloudEndpoints {
         } catch (RuntimeException e) {
             ErrorPrintLn("CreatePayment Exception: " + e.getMessage());
             return Payment.create();
+        }
+    }
+
+    /*
+     * Payment Delivery Date
+     * Gets Payment Delivery Date.
+     */
+    static PaymentDeliveryDate PaymentDeliveryDate(CurrencyCloudClient client, PaymentDeliveryDate deliveryDate) {
+        PaymentDeliveryDate paymentDeliveryDate;
+        try {
+            final BackOffResult<PaymentDeliveryDate> paymentDeliveryDateResult = BackOff.<PaymentDeliveryDate>builder()
+                    .withTask(() -> client.getPaymentDeliveryDate(deliveryDate.getPaymentDate(),
+                            deliveryDate.getPaymentType(),
+                            deliveryDate.getCurrency(),
+                            deliveryDate.getBankCountry()))
+                    .execute();
+            paymentDeliveryDate = paymentDeliveryDateResult.data.orElse(PaymentDeliveryDate.create());
+            return paymentDeliveryDate;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("PaymentDeliveryDate Exception: " + e.getMessage());
+            return PaymentDeliveryDate.create();
         }
     }
 
