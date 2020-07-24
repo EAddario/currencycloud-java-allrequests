@@ -746,6 +746,27 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Payment Delivery Date
+     * Gets Payment Delivery Date.
+     */
+    static PaymentDeliveryDate PaymentDeliveryDate(CurrencyCloudClient client, PaymentDeliveryDate deliveryDate) {
+        PaymentDeliveryDate paymentDeliveryDate;
+        try {
+            final BackOffResult<PaymentDeliveryDate> paymentDeliveryDateResult = BackOff.<PaymentDeliveryDate>builder()
+                    .withTask(() -> client.getPaymentDeliveryDate(deliveryDate.getPaymentDate(),
+                            deliveryDate.getPaymentType(),
+                            deliveryDate.getCurrency(),
+                            deliveryDate.getBankCountry()))
+                    .execute();
+            paymentDeliveryDate = paymentDeliveryDateResult.data.orElse(PaymentDeliveryDate.create());
+            return paymentDeliveryDate;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("PaymentDeliveryDate Exception: " + e.getMessage());
+            return PaymentDeliveryDate.create();
+        }
+    }
+
+    /*
      * Retrieve a Payment
      * Returns an object containing the details of a payment.
      */
