@@ -326,8 +326,11 @@ public class AllRequests {
         PaymentDeliveryDate paymentDeliveryDate = PaymentDeliveryDate(client, deliveryDate);
         PrintLn("Payment Delivery Date: " + paymentDeliveryDate);
 
-        PaymentSubmission retrievedPaymentSubmission = RetrievePaymentSubmission(client, payment);
-        PrintLn("Retrieve Payment Submission: " + retrievedPaymentSubmission);
+        QuotePaymentFee paymentFee = QuotePaymentFee.create(retrievedPayment.getCurrency(),
+                retrievedBeneficiary.getBankCountry(),
+                retrievedPayment.getPaymentType());
+        QuotePaymentFee quotedPaymentFee = PaymentFeeQuote(client, paymentFee);
+        PrintLn("Quote Payment Fee: " + quotedPaymentFee);
 
         payment.setWithDeleted(false);
         payment.setReference("REF-INV-" + new Random().nextInt(1000));

@@ -767,6 +767,28 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Quote Payment Fee
+     * Gets the calculated quote for the fee that will be applied against a payment.
+     */
+    static QuotePaymentFee PaymentFeeQuote(CurrencyCloudClient client, QuotePaymentFee feeQuote) {
+        QuotePaymentFee quotePaymentFee;
+        try {
+            final BackOffResult<QuotePaymentFee> quotePaymentFeeResult = BackOff.<QuotePaymentFee>builder()
+                    .withTask(() -> client.getQuotePaymentFee(null,
+                            feeQuote.getPaymentCurrency(),
+                            feeQuote.getPaymentDestinationCountry(),
+                            feeQuote.getPaymentType(),
+                            null))
+                    .execute();
+            quotePaymentFee = quotePaymentFeeResult.data.orElse(QuotePaymentFee.create());
+            return quotePaymentFee;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("PaymentDeliveryDate Exception: " + e.getMessage());
+            return QuotePaymentFee.create();
+        }
+    }
+
+    /*
      * Retrieve a Payment
      * Returns an object containing the details of a payment.
      */
