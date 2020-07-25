@@ -404,6 +404,9 @@ public class AllRequests {
         BankDetails bankDetails = BankDetails(client, "iban", "GB19TCCL00997901654515");
         PrintLn("Bank Details: " + bankDetails);
 
+        List<PaymentFeeRule> paymentFeeRules = PaymentFeeRules(client, null, null, null);
+        PrintLn("Payment Fee Rules: " + "{\"payment_fee_rules\":" + paymentFeeRules + "}");
+
         /*
          * Report Requests API
          */
