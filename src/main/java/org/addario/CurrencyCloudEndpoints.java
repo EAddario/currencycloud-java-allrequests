@@ -1051,6 +1051,24 @@ class CurrencyCloudEndpoints {
     }
 
     /*
+     * Payment Fee Rules
+     * Returns the payment fee information based on the specific values provided.
+     */
+    static List<PaymentFeeRule> PaymentFeeRules(CurrencyCloudClient client, String accountId, String paymentType, String chargeType) {
+        List<PaymentFeeRule> paymentFeeRules;
+        try {
+            final BackOffResult<List<PaymentFeeRule>> paymentFeeRulesResult = BackOff.<List<PaymentFeeRule>>builder()
+                    .withTask(() -> client.paymentFeeRules(accountId, paymentType, chargeType))
+                    .execute();
+            paymentFeeRules = paymentFeeRulesResult.data.orElse(null);
+            return paymentFeeRules;
+        } catch (RuntimeException e) {
+            ErrorPrintLn("PaymentFeeRules Exception: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /*
      * Create Conversion Report
      *
      */
