@@ -22,9 +22,9 @@
     <dependencies>
         <!-- Build dependencies: -->
         <dependency>
-            <groupId>com.currencycloud.currencycloud-java</groupId>
-            <artifactId>currencycloud-java</artifactId>
-            <version>3.6.3-ea</version>
+            <groupId>org.addario.currencycloud</groupId>
+            <artifactId>currencycloud-java-client</artifactId>
+            <version>3.6.1-ea</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
