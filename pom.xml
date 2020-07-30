@@ -22,7 +22,7 @@
     <dependencies>
         <!-- Build dependencies: -->
         <dependency>
-            <groupId>org.addario.currencycloud</groupId>
+            <groupId>io.github.addario-org</groupId>
             <artifactId>currencycloud-java-client</artifactId>
             <version>3.6.1-ea</version>
         </dependency>
